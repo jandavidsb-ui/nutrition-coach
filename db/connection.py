@@ -57,7 +57,11 @@ class _Conn:
 
 
 def get_connection() -> _Conn:
-    pg_conn = psycopg2.connect(config.DATABASE_URL)
+    url = config.DATABASE_URL
+    # Ensure SSL is required for cloud deployments (Supabase needs this)
+    if "sslmode" not in url:
+        url += ("&" if "?" in url else "?") + "sslmode=require"
+    pg_conn = psycopg2.connect(url)
     return _Conn(pg_conn)
 
 
